@@ -1,0 +1,53 @@
+version: "3"
+services:
+  api:
+    build: .
+    restart: always
+    # network_mode: "host" #for localhost db
+    ports:
+      - 8000:8000
+    volumes: #synching change so dont need to rebuild image for every modificatio 
+      - ./:/usr/src/app:ro
+    # env_file: #for directly using .ev file
+    #   - ./.env
+    environment:
+      - DATABASE_HOSTNAME=db
+      - DATABASE_PORT=5432
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=fastapi
+      - DATABASE_USERNAME=postgres
+      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    depends_on:
+      - db
+    # networks:
+    #   - fastapinetwork
+    
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fastapi
+    # ports:
+    #   - 8001:5432
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    # networks:
+    #   - fastapinetwork
+
+volumes:
+  postgres-db:  
+
+# networks:
+#   fastapinetwork:
+#     driver: bridge
+
+# problem have to build table using docker run alembic upgrade head and 
+# have access issue when app is trying to access the postgres container
+
+#  docker run fast_api_api alembic upgrade head
+
+#TODO:
+#maybe create seperate dev and production docker-compose yaml file

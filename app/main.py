@@ -3,8 +3,11 @@ from . import models
 from .database import engine
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import post, user, auth, vote
+from .config import settings
 
 # uvicorn app.main:app --reload
+#docker run -p 8000:8000 tut-fastapi, for accessing it localhost
+#docker run --network=host -p 8000:8000 tut-fastapi, for accessing the database
 
 #using alembic so not using sqlalchemy to generate database
 #models.Base.metadata.create_all(bind=engine)
@@ -28,4 +31,4 @@ app.include_router(vote.router)
 
 @app.get("/")
 def root():
-    return {"message": "Hello"}
+    return {"message": "Welcome to fastapi!!"}
